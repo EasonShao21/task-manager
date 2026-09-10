@@ -15,6 +15,8 @@ const tasks = ref([]);
 const loading = ref(false);
 const errorMessage = ref("");
 
+const filterStatus = ref("all");
+
 const totalTasks = computed(() => tasks.value.length);
 
 const completedTasks = computed(
@@ -145,6 +147,17 @@ const removeTask = async (id) => {
   }
 };
 
+// 篩選任務
+const filteredTasks = computed(() => {
+  if (filterStatus.value === "completed") {
+    return tasks.value.filter((task) => task.completed);
+  }
+  if (filterStatus.value === "pending") {
+    return tasks.value.filter((task) => !task.completed);
+  }
+  return tasks.value;
+});
+
 onMounted(loadTasks);
 </script>
 
@@ -198,6 +211,17 @@ onMounted(loadTasks);
       <TaskForm
         @add-task="addTask"
       />
+      <div class="mt-3 h-20 flex items-center justify-end">
+        <select
+          v-model="filterStatus"
+          class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700
+                focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+        >
+          <option value="all">All</option>
+          <option value="completed">Completed</option>
+          <option value="pending">Pending</option>
+        </select>
+      </div>
 
       <!-- API Error -->
       <div
@@ -218,7 +242,7 @@ onMounted(loadTasks);
       <!-- Task List -->
       <TaskList
         v-else
-        :tasks="tasks"
+        :tasks="filteredTasks"
         @save-task="saveTask"
         @toggle-task="toggleTask"
         @delete-task="removeTask"

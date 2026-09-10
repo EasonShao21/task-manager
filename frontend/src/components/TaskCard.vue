@@ -1,10 +1,6 @@
 <script setup>
 import { ref, watch } from "vue";
 
-// [AI assisted chat-008]
-// 使用 AI 協助拆分單筆任務卡片
-// 透過 props 接收 Task，並透過 emit 將修改事件傳回父層
-
 const props = defineProps({
   task: {
     type: Object,
@@ -25,7 +21,7 @@ const editForm = ref({
   description: "",
 });
 
-/*
+/* [AI assisted chat-008]
  * 當父層 task 更新時，同步更新 editForm。
  * immediate: true 讓元件第一次建立時也會立即執行。
  */

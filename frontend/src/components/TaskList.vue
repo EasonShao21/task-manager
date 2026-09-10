@@ -1,10 +1,6 @@
 <script setup>
 import TaskCard from "./TaskCard.vue";
 
-// [AI assisted chat-008]
-// 使用 AI 協助將任務列表拆成獨立元件
-// TaskList 只負責列表渲染，實際操作事件再往父元件傳遞
-
 defineProps({
   tasks: {
     type: Array,

@@ -1,13 +1,14 @@
 <script setup>
-import { ref } from "vue";
-
-// [AI assisted chat-008]
-// 使用 AI 協助將新增任務表單從 App.vue 拆分成獨立元件
+import { ref, computed  } from "vue";
 
 const emit = defineEmits(["add-task"]);
 
 const title = ref("");
 const description = ref("");
+
+const isFormValid = computed(() => {
+  return title.value.trim().length > 0;
+});
 
 const handleSubmit = () => {
   const trimmedTitle = title.value.trim();
@@ -51,7 +52,8 @@ const handleSubmit = () => {
 
       <button
         type="button"
-        class="rounded-lg bg-blue-600 px-5 py-2 text-white transition hover:bg-blue-700"
+        class="rounded-lg bg-blue-600 px-5 py-2 text-white disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
+        :disabled="!isFormValid"
         @click="handleSubmit"
       >
         Add Task
