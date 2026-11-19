@@ -1,0 +1,12 @@
+對話編號：009
+
+使用者需求：建立名片管理系統，包含名片清單、建立、編輯、刪除、名片外觀與顯示欄位自訂、QR code、RWD；後端使用 Spring Boot 3、前端使用 Vue 3，並提供 OpenAPI 規格、領域模型文件與 GitHub repository。AI 協助需在相關程式碼加註解並保存對話紀錄。
+
+AI 協助摘要：
+- 檢視既有 Git 專案，沿用已存在的 Cardfolio Vue 介面與 Spring Boot 專案。
+- 新增 BusinessCard 持久化領域模型、驗證請求 DTO、Spring Data repository、REST CRUD controller 與錯誤處理。
+- 加入 H2 預設資料庫、PostgreSQL 環境變數設定、OpenAPI 契約與示範名片。
+- 將 Vue 名片介面連接後端 API，支援舊版 localStorage 名片遷移、欄位顯示設定與公開名片路徑。
+- 撰寫 README 的啟動、OpenAPI、領域模型及 Repository 說明。
+
+相關程式碼標註：`[AI assisted chat-009]`。

@@ -1,0 +1,93 @@
+openapi: 3.0.3
+info:
+  title: Cardfolio API
+  version: 1.0.0
+  description: 個人數位名片的 CRUD 與外觀設定 API
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/cards:
+    get:
+      summary: 列出名片
+      responses:
+        '200':
+          description: 名片清單
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/BusinessCard' }
+    post:
+      summary: 建立名片
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CardInput' }
+      responses:
+        '201':
+          description: 建立成功
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BusinessCard' }
+        '400': { description: 請求欄位驗證失敗 }
+  /api/cards/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: integer, format: int64 }
+    get:
+      summary: 取得公開名片
+      responses:
+        '200':
+          description: 名片資料
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BusinessCard' }
+        '404': { description: 名片不存在或未公開 }
+    put:
+      summary: 更新名片與自訂設定
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CardInput' }
+      responses:
+        '200':
+          description: 更新後名片
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BusinessCard' }
+    delete:
+      summary: 刪除名片
+      responses:
+        '204': { description: 刪除成功 }
+        '404': { description: 名片不存在 }
+components:
+  schemas:
+    CardInput:
+      type: object
+      required: [name, role, color]
+      properties:
+        name: { type: string, maxLength: 60 }
+        role: { type: string, maxLength: 80 }
+        company: { type: string, maxLength: 80, nullable: true }
+        email: { type: string, format: email, maxLength: 254, nullable: true }
+        phone: { type: string, maxLength: 40, nullable: true }
+        website: { type: string, maxLength: 180, nullable: true }
+        location: { type: string, maxLength: 100, nullable: true }
+        color: { type: string, enum: [violet, mint, sand] }
+        displayFields:
+          type: array
+          uniqueItems: true
+          items: { type: string, enum: [email, phone, website, location] }
+        published: { type: boolean, default: true }
+    BusinessCard:
+      allOf:
+        - { $ref: '#/components/schemas/CardInput' }
+        - type: object
+          properties:
+            id: { type: integer, format: int64, readOnly: true }
+            createdAt: { type: string, format: date-time, readOnly: true }
+            updatedAt: { type: string, format: date-time, readOnly: true }
