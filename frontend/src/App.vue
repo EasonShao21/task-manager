@@ -2,9 +2,10 @@
 import { computed, onMounted, ref } from 'vue'
 
 // [AI assisted chat-009] AI 協助將介面由本機暫存改為呼叫 Spring Boot 名片 API。
-const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
+// [AI assisted chat-010] 手機經區網開啟時，API 網址沿用電腦的區網主機名稱。
+const apiBase = import.meta.env.VITE_API_BASE_URL || `${globalThis.location.protocol}//${globalThis.location.hostname}:8080/api`
 const cards = ref([])
-const origin = globalThis.location.origin
+const shareOrigin = ref(globalThis.location.origin)
 const selectedId = ref(null)
 const loading = ref(true)
 const search = ref('')
@@ -23,7 +24,14 @@ async function request(path = '', options = {}) {
   return response.status === 204 ? null : response.json()
 }
 function withInitials(card) { return { ...card, initials: initials(card.name) } }
+async function loadShareOrigin() {
+  try {
+    const response = await fetch(`${apiBase}/share-config`)
+    if (response.ok) shareOrigin.value = (await response.json()).frontendBaseUrl
+  } catch { /* 本機 API 未提供分享網址時，沿用目前瀏覽器網址。 */ }
+}
 async function loadCards() {
+  await loadShareOrigin()
   try {
     let result = await request()
     // [AI assisted chat-009] 首次啟動時將舊版瀏覽器範例資料匯入後端，避免使用者資料消失。
@@ -67,8 +75,9 @@ async function togglePublished(card) {
   } catch (error) { notify(error.message) }
 }
 function notify(message) { toast.value = message; setTimeout(() => toast.value = '', 2400) }
-function copyLink(card) { navigator.clipboard?.writeText(`${origin}/card/${card.id}`); notify('名片連結已複製') }
-function qrUrl(card) { return `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=4&data=${encodeURIComponent(`${origin}/card/${card.id}`)}` }
+function cardUrl(card) { return `${shareOrigin.value}/card/${card.id}` }
+function copyLink(card) { navigator.clipboard?.writeText(cardUrl(card)); notify('名片連結已複製') }
+function qrUrl(card) { return `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=4&data=${encodeURIComponent(cardUrl(card))}` }
 const isPublicRoute = globalThis.location.pathname.startsWith('/card/')
 const publicCardId = isPublicRoute ? globalThis.location.pathname.split('/').pop() : null
 const publicCard = ref(null)
@@ -112,7 +121,7 @@ if (publicCardId) request(`/${publicCardId}`).then(card => { if (card.published)
         </section>
 
         <section v-if="selected" class="preview-panel"><div class="preview-heading"><div><h2>即時預覽</h2><p>名片的數位樣貌</p></div><button class="icon-button" title="編輯名片" @click="openEdit(selected)">✎</button></div><div class="preview-stage"><div class="profile-card" :class="`theme-${selected.color}`"><span class="profile-brand">cardfolio<span>.</span></span><span class="profile-monogram">{{ selected.initials }}</span><div class="profile-details"><div class="profile-name">{{ selected.name }}</div><div class="profile-role">{{ selected.role }}<template v-if="selected.company"> · {{ selected.company }}</template></div><div class="profile-rule"></div><div class="profile-contact"><span v-if="selected.displayFields.includes('email') && selected.email">✉ <span>{{ selected.email }}</span></span><span v-if="selected.displayFields.includes('phone') && selected.phone">↗ <span>{{ selected.phone }}</span></span><span v-if="selected.displayFields.includes('website') && selected.website">↗ <span>{{ selected.website }}</span></span><span v-if="selected.displayFields.includes('location') && selected.location">⌖ <span>{{ selected.location }}</span></span></div></div><span class="profile-decoration deco-a"></span><span class="profile-decoration deco-b"></span></div><div class="stage-caption"><span class="live-dot"></span> 正面預覽 <span class="caption-sep">·</span> {{ selected.color === 'violet' ? '暮紫' : selected.color === 'mint' ? '薄荷' : '暖沙' }}配色</div></div>
-          <div class="share-box"><div class="share-copy"><span class="share-icon">⌁</span><div><strong>分享你的名片</strong><p>掃描 QR code 或複製專屬連結</p></div></div><div class="share-content"><div class="qr-frame"><img :src="qrUrl(selected)" alt="名片 QR code"></div><div class="share-link"><span>專屬名片連結</span><div><code>{{ origin }}/card/{{ selected.id }}</code><button @click="copyLink(selected)" title="複製連結">▢</button></div><button class="text-button" @click="togglePublished(selected)">{{ selected.published ? '設為私人名片' : '公開這張名片' }} <span>↗</span></button></div></div></div>
+          <div class="share-box"><div class="share-copy"><span class="share-icon">⌁</span><div><strong>分享你的名片</strong><p>掃描 QR code 或複製專屬連結</p></div></div><div class="share-content"><div class="qr-frame"><img :src="qrUrl(selected)" alt="名片 QR code"></div><div class="share-link"><span>專屬名片連結</span><div><code>{{ cardUrl(selected) }}</code><button @click="copyLink(selected)" title="複製連結">▢</button></div><button class="text-button" @click="togglePublished(selected)">{{ selected.published ? '設為私人名片' : '公開這張名片' }} <span>↗</span></button></div></div></div>
           <div class="quick-actions"><button @click="openEdit(selected)"><span>✎</span> 編輯名片</button><button @click="copyLink(selected)"><span>↗</span> 分享連結</button><button class="delete-action" @click="removeCard(selected)"><span>⌫</span> 刪除</button></div>
         </section>
         <section v-else class="preview-panel blank-preview"><div class="blank-icon">✳</div><h2>先建立你的第一張名片</h2><p>完成個人資訊後，就能即時預覽並分享。</p><button class="primary-button" @click="openCreate">＋ 建立新名片</button></section>
