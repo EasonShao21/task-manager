@@ -10,7 +10,7 @@ import java.util.List;
 // [AI assisted chat-009] AI 協助實作 RESTful CRUD 與 OpenAPI 註解。
 @RestController
 @RequestMapping("/api/cards")
-@CrossOrigin(originPatterns = {"http://localhost:*", "http://127.0.0.1:*", "http://192.168.*.*:*", "http://10.*.*.*:*", "http://172.*.*.*:*"})
+@CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173"})
 @Tag(name = "名片", description = "建立、查詢、更新與刪除數位名片")
 public class CardController {
     private final CardRepository cards;

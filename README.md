@@ -34,14 +34,6 @@ npm run dev
 
 開啟 Vite 顯示的網址（預設 `http://localhost:5173`）。若 API 不在 `http://localhost:8080`，設定前端環境變數 `VITE_API_BASE_URL` 為 API 前綴，例如 `https://api.example.com/api`。
 
-### 用手機掃描本機 QR code
-
-1. 確認手機和電腦連上同一個 Wi-Fi。
-2. 啟動 Vite 後，從電腦的區域網路網址開啟前端（Vite 會顯示 `Network` 網址）；不要用 `localhost` 網址在手機開啟。
-3. 電腦防火牆允許前端 `5173` 與後端 `8080` 連線。
-
-QR code 會使用後端偵測到的電腦區網 IP。若電腦有多張網卡或使用正式部署網址，可設定後端環境變數 `CARDFOLIO_FRONTEND_BASE_URL` 覆寫，例如 `http://192.168.1.20:5173`。手機掃碼必須能連到這個網址和 `8080` API 埠。
-
 ## OpenAPI 規格與 API
 
 - OpenAPI 原始契約：[`backend/src/main/resources/openapi.yaml`](backend/src/main/resources/openapi.yaml)
@@ -52,7 +44,6 @@ QR code 會使用後端偵測到的電腦區網 IP。若電腦有多張網卡或
 | 方法 | 路徑 | 說明 |
 | --- | --- | --- |
 | `GET` | `/api/cards` | 列出名片 |
-| `GET` | `/api/share-config` | 取得手機掃碼用的前端網址 |
 | `POST` | `/api/cards` | 建立名片 |
 | `GET` | `/api/cards/{id}` | 取得公開名片（私人或不存在的名片回傳 404） |
 | `PUT` | `/api/cards/{id}` | 更新名片資料與外觀設定 |
@@ -86,4 +77,4 @@ Repository：<https://github.com/EasonShao21/task-manager>
 
 ## AI 使用紀錄
 
-本次使用 AI 協助建立名片領域模型、CRUD API 與 OpenAPI 契約，將前端資料接至 API，並處理手機透過區域網路掃描 QR code 的情境。程式碼標註與對話摘要位於 [`chat-records/009.chat`](chat-records/009.chat) 和 [`chat-records/010.chat`](chat-records/010.chat)。
+本次使用 AI 協助建立名片領域模型、CRUD API 與 OpenAPI 契約，將前端資料接至 API，並撰寫專案操作與領域模型文件。程式碼標註與對話摘要位於 [`chat-records/009.chat`](chat-records/009.chat)。
